@@ -1,0 +1,144 @@
+{
+  "info": {
+    "name": "Library Management API",
+    "description": "REST endpoints for the library management API. Set the `baseUrl` collection variable (defaults to http://localhost:8080). Register a borrower and a book first; their ids are captured automatically into `borrowerId` and `bookId` for the borrow/return requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "borrowerId", "value": "" },
+    { "key": "bookId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Register borrower",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status is 201', function () { pm.response.to.have.status(201); });",
+              "var json = pm.response.json();",
+              "pm.collectionVariables.set('borrowerId', json.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Alice Reader\",\n  \"email\": \"alice@example.com\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/borrowers", "host": ["{{baseUrl}}"], "path": ["api", "v1", "borrowers"] }
+      }
+    },
+    {
+      "name": "Register book",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status is 201', function () { pm.response.to.have.status(201); });",
+              "var json = pm.response.json();",
+              "pm.collectionVariables.set('bookId', json.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"isbn\": \"978-0132350884\",\n  \"title\": \"Clean Code\",\n  \"author\": \"Robert C. Martin\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/books", "host": ["{{baseUrl}}"], "path": ["api", "v1", "books"] }
+      }
+    },
+    {
+      "name": "Register second copy (same ISBN, new id)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"isbn\": \"978-0132350884\",\n  \"title\": \"Clean Code\",\n  \"author\": \"Robert C. Martin\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/books", "host": ["{{baseUrl}}"], "path": ["api", "v1", "books"] }
+      }
+    },
+    {
+      "name": "Register conflicting ISBN (expect 409)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"isbn\": \"978-0132350884\",\n  \"title\": \"A Different Title\",\n  \"author\": \"Someone Else\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/books", "host": ["{{baseUrl}}"], "path": ["api", "v1", "books"] }
+      }
+    },
+    {
+      "name": "List all books",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/api/v1/books", "host": ["{{baseUrl}}"], "path": ["api", "v1", "books"] }
+      }
+    },
+    {
+      "name": "Borrow book",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/borrowers/{{borrowerId}}/borrow/{{bookId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "borrowers", "{{borrowerId}}", "borrow", "{{bookId}}"]
+        }
+      }
+    },
+    {
+      "name": "Borrow same book again (expect 409)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/borrowers/{{borrowerId}}/borrow/{{bookId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "borrowers", "{{borrowerId}}", "borrow", "{{bookId}}"]
+        }
+      }
+    },
+    {
+      "name": "Return book",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/borrowers/{{borrowerId}}/return/{{bookId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "borrowers", "{{borrowerId}}", "return", "{{bookId}}"]
+        }
+      }
+    },
+    {
+      "name": "Return book again (expect 409)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/borrowers/{{borrowerId}}/return/{{bookId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "borrowers", "{{borrowerId}}", "return", "{{bookId}}"]
+        }
+      }
+    }
+  ]
+}

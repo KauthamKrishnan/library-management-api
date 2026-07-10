@@ -1,0 +1,12 @@
+target/
+!target/*.jar
+.git
+.gitignore
+.idea
+*.iml
+.vscode
+HELP.md
+README.md
+postman/
+Dockerfile
+.dockerignore
